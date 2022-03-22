@@ -3,6 +3,8 @@ SystemVerilog code for a solid state tesla coil controller running on a Tang Nan
 
 Currently just a basic frequency-locked loop with an interrupter.
 
+Video of the coil in action: https://www.youtube.com/watch?v=hA358tcXEGo
+
 # Goals
 - 1.2GHz IO-Clock with OSER16/IDES16 primitives (and 75MHz system clock for processing)
 - Switching synchronous gate drive enable
