@@ -1,0 +1,32 @@
+//Copyright (C)2014-2022 Gowin Semiconductor Corporation.
+//All rights reserved. 
+//File Title: Physical Constraints file
+//GOWIN Version: 1.9.8.03 Education
+//Part Number: GW1NR-LV9QN88PC6/I5
+//Device: GW1NR-9C
+//Created Time: Sat 03 19 20:53:29 2022
+
+IO_LOC "leds[5]" 16;
+IO_PORT "leds[5]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "leds[4]" 15;
+IO_PORT "leds[4]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "leds[3]" 14;
+IO_PORT "leds[3]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "leds[2]" 13;
+IO_PORT "leds[2]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "leds[1]" 11;
+IO_PORT "leds[1]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "leds[0]" 10;
+IO_PORT "leds[0]" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "signal" 69;
+IO_PORT "signal" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=24;
+IO_LOC "enable_n" 68;
+IO_PORT "enable_n" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=24;
+IO_LOC "antenna" 57;
+IO_PORT "antenna" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+IO_LOC "fire_button" 3;
+IO_PORT "fire_button" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+IO_LOC "reset_n" 4;
+IO_PORT "reset_n" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+IO_LOC "clock" 52;
+IO_PORT "clock" IO_TYPE=LVCMOS33 PULL_MODE=UP;
