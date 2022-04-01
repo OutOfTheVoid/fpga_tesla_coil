@@ -5,10 +5,13 @@ Currently just a basic frequency-locked loop with an interrupter.
 
 Video of the coil in action: https://www.youtube.com/watch?v=hA358tcXEGo
 
-# Goals
+# Features
 - 1.2GHz IO-Clock with OSER16/IDES16 primitives (and 75MHz system clock for processing)
+- QCW Phase shifting for long sparks
+
+# Goals
+
 - Switching synchronous gate drive enable
 - Gate-driver delay-lead compensation
 - Over-current detection for DRSSTC operation
-- QCW Phase shifting for long sparks
 - RV32 softcore for serial control and easy configuration via firmware
