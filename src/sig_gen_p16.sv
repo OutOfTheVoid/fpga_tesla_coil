@@ -1,54 +1,62 @@
 module B4To16SigDecoder (
+	input reset,
+	input clock,
 	input [3:0] in,
 	input in_high,
 	input in_transition,
 	output [15:0] out
 );
-
+	
+	reg [3:0] in_registered;
+	reg in_high_registered;
+	reg in_transition_registered;
+	
+	reg flip_outputs;
+	reg [15:0] transition_outputs;
+	reg [15:0] outputs_flipped;
 	logic [15:0] outputs;
+	logic [15:0] outputs_flipped_next;
+	logic [15:0] transition_outputs_next;
 	
 	always_comb begin
-		if (in_transition) begin
-			case ({in_high, in})
-				5'b00000: outputs = 'b1111_1111_1111_1111;
-				5'b00001: outputs = 'b0111_1111_1111_1111;
-				5'b00010: outputs = 'b0011_1111_1111_1111;
-				5'b00011: outputs = 'b0001_1111_1111_1111;
-				5'b00100: outputs = 'b0000_1111_1111_1111;
-				5'b00101: outputs = 'b0000_0111_1111_1111;
-				5'b00110: outputs = 'b0000_0011_1111_1111;
-				5'b00111: outputs = 'b0000_0001_1111_1111;
-				5'b01000: outputs = 'b0000_0000_1111_1111;
-				5'b01001: outputs = 'b0000_0000_0111_1111;
-				5'b01010: outputs = 'b0000_0000_0011_1111;
-				5'b01011: outputs = 'b0000_0000_0001_1111;
-				5'b01100: outputs = 'b0000_0000_0000_1111;
-				5'b01101: outputs = 'b0000_0000_0000_0111;
-				5'b01110: outputs = 'b0000_0000_0000_0011;
-				5'b01111: outputs = 'b0000_0000_0000_0001;
-				5'b10000: outputs = 'b0000_0000_0000_0000;
-				5'b10001: outputs = 'b1000_0000_0000_0000;
-				5'b10010: outputs = 'b1100_0000_0000_0000;
-				5'b10011: outputs = 'b1110_0000_0000_0000;
-				5'b10100: outputs = 'b1111_0000_0000_0000;
-				5'b10101: outputs = 'b1111_1000_0000_0000;
-				5'b10110: outputs = 'b1111_1100_0000_0000;
-				5'b10111: outputs = 'b1111_1110_0000_0000;
-				5'b11000: outputs = 'b1111_1111_0000_0000;
-				5'b11001: outputs = 'b1111_1111_1000_0000;
-				5'b11010: outputs = 'b1111_1111_1100_0000;
-				5'b11011: outputs = 'b1111_1111_1110_0000;
-				5'b11100: outputs = 'b1111_1111_1111_0000;
-				5'b11101: outputs = 'b1111_1111_1111_1000;
-				5'b11110: outputs = 'b1111_1111_1111_1100;
-				5'b11111: outputs = 'b1111_1111_1111_1110;
-			endcase
+		case (in_registered)
+			4'b00000: transition_outputs_next = 'b1111_1111_1111_1111;
+			4'b00001: transition_outputs_next = 'b0111_1111_1111_1111;
+			4'b00010: transition_outputs_next = 'b0011_1111_1111_1111;
+			4'b00011: transition_outputs_next = 'b0001_1111_1111_1111;
+			4'b00100: transition_outputs_next = 'b0000_1111_1111_1111;
+			4'b00101: transition_outputs_next = 'b0000_0111_1111_1111;
+			4'b00110: transition_outputs_next = 'b0000_0011_1111_1111;
+			4'b00111: transition_outputs_next = 'b0000_0001_1111_1111;
+			4'b01000: transition_outputs_next = 'b0000_0000_1111_1111;
+			4'b01001: transition_outputs_next = 'b0000_0000_0111_1111;
+			4'b01010: transition_outputs_next = 'b0000_0000_0011_1111;
+			4'b01011: transition_outputs_next = 'b0000_0000_0001_1111;
+			4'b01100: transition_outputs_next = 'b0000_0000_0000_1111;
+			4'b01101: transition_outputs_next = 'b0000_0000_0000_0111;
+			4'b01110: transition_outputs_next = 'b0000_0000_0000_0011;
+			4'b01111: transition_outputs_next = 'b0000_0000_0000_0001;
+		endcase
+		
+		outputs = in_transition_registered ? transition_outputs : 'h0000;
+		
+		if (reset) begin
+			outputs_flipped_next = flip_outputs ? ~outputs : outputs;
 		end else begin
-			outputs = in_high ? 16'hFFFF : 16'h0000;
+			outputs_flipped_next = '0;
 		end
 	end
+	
+	always_ff @(posedge clock) begin
+		in_registered <= in;
+		in_high_registered <= in_high;
+		in_transition_registered <= in_transition;
+		flip_outputs <= in_high_registered;
+		transition_outputs <= transition_outputs_next;
+		outputs_flipped <= outputs_flipped_next;
+	end
 		
-	assign out = {<<{outputs}};
+	assign out = {<<{outputs_flipped}};
 	
 endmodule
 
@@ -84,6 +92,7 @@ module SignalGenP16 #(
 	logic [31:0] period_next;
 	logic [31:0] counter_next;
 	
+	logic [9:0] phase2_next;
 	logic [9:0] phase2_in_sticky_next;
 	logic phase2_set_sticky_next;
 	
@@ -114,10 +123,9 @@ module SignalGenP16 #(
 	logic [3:0] phase2_t_rollover;
 	logic [3:0] phase2_t_half;
 	
-	assign internal_transition = transition;
-	assign internal_t_transition = t_transition;
-	
 	B4To16SigDecoder signal_decoder (
+		.reset(reset),
+		.clock(p_clock),
 		.in(t_transition),
 		.in_high(signal_high),
 		.in_transition(transition),
@@ -125,6 +133,8 @@ module SignalGenP16 #(
 	);
 	
 	B4To16SigDecoder phase2_signal_decoder (
+		.reset(reset),
+		.clock(p_clock),
 		.in(phase2_t_transition),
 		.in_high(phase2_signal_high),
 		.in_transition(phase2_transition),
@@ -152,6 +162,8 @@ module SignalGenP16 #(
 		phase2_t_rollover = period - counter_phase2;
 		phase2_t_half = half_period - counter_phase2;
 		phase2_t_transition  = phase2_signal_high ? phase2_t_half : phase2_t_rollover;
+		
+		phase2_next = phase2_set_sticky ? phase2_in_sticky : phase2;
 		
 		if (reset) begin
 			rollover = '0;
@@ -188,7 +200,7 @@ module SignalGenP16 #(
 			period_next = (rollover & period_set_sticky) ? period_in_sticky : period;
 			
 			phase2_rollover = counter_phase2_incremented >= period;
-			phase2_half = counter_phase2 >= half_period;
+			phase2_half = counter_phase2_incremented >= half_period;
 			phase2_transition = (phase2_half & phase2_signal_high) | phase2_rollover;
 			
 			phase2_signal_high_next = phase2_signal_high ^ phase2_transition;
@@ -206,6 +218,7 @@ module SignalGenP16 #(
 		signal_high <= signal_high_next;
 		phase2_in_sticky <= phase2_in_sticky_next;
 		phase2_set_sticky <= phase2_set_sticky_next;
+		phase2 <= phase2_next;
 		phase2_offset <= phase2_offset_next;
 		phase2_signal_high <= phase2_signal_high_next;
 	end
