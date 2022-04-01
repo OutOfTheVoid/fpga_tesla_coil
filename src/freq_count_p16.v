@@ -56,7 +56,7 @@ module FreqCounter16P (
 	input reset,
 	input [15:0] in_p16,
 	output period_valid,
-	output [31:0] period
+	output [31:0] period_out
 );
 	
 	reg last_edge;
@@ -80,6 +80,8 @@ module FreqCounter16P (
 		.edge_detect(is_edge),
 		.edge_t(edge_t)
 	);
+	
+	assign period_out = period;
 	
 	always_comb begin
 		if (reset) begin
@@ -105,7 +107,7 @@ module FreqCounter16P (
 			end else begin
 				last_edge_next = last_edge;
 				counter_next      = counter + 16;
-				period_next       = period;
+				period_next       = period_out;
 				valid_start_next  = valid_start;
 				valid_period_next = 0;
 			end
